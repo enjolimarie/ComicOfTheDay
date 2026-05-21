@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Comic of the Day{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* Registered CSS custom properties let the browser interpolate gradient colors */
+  @property --grad-color1 {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: #1a1a2e;
+  }
+  @property --grad-color2 {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: #16213e;
+  }
+
+  body {
+    --grad-color1: {{ comic.dominant_color }};
+    --grad-color2: {{ comic.secondary_color }};
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--grad-color1) 0%, var(--grad-color2) 100%);
+    transition: --grad-color1 1.2s ease, --grad-color2 1.2s ease;
+  }
+
+  /* Tilt card — no transition during mouse move (fast tracking),
+     transition restored on mouseleave for smooth spring-back */
+  #comic-tilt {
+    will-change: transform;
+    transform-style: preserve-3d;
+  }
+  #comic-tilt.is-resetting {
+    transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 0.55s ease;
+  }
+
+  #comic-img {
+    display: block;
+    opacity: 0;                  /* hidden until JS restore check runs */
+    transition: opacity 0.3s ease;
+  }
+
+  /* Gloss overlay: follows cursor as a soft radial highlight */
+  #comic-gloss {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem; /* matches rounded-xl */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  /* Fetch button */
+  #fetch-btn {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  }
+  #fetch-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+  }
+  #fetch-btn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.97);
+  }
+  #fetch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  @keyframes btn-spin {
+    to { transform: rotate(360deg); }
+  }
+  .btn-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: btn-spin 0.65s linear infinite;
+    vertical-align: -2px;
+    margin-right: 7px;
+  }
+
+  /* Comic book title */
+  .comic-title {
+    font-family: 'Bangers', 'Impact', cursive;
+    font-size: clamp(3.2rem, 10vw, 6.5rem);
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: #FFE629;
+    -webkit-text-stroke: 3px #111;
+    text-shadow:
+      3px  3px 0 #111,
+      6px  6px 0 #111,
+      9px  9px 0 rgba(0, 0, 0, 0.25);
+  }
+</style>
+{% endblock %}
+
+{% block body_attrs %}{% endblock %}
+
+{% block content %}
+<main class="flex flex-col items-center justify-center min-h-screen pt-16 pb-8 px-4">
+
+  <h1 class="comic-title text-center mb-10">
+    Comic of the Day
+  </h1>
+
+  {% if comic.image_url %}
+  <div class="flex flex-col items-center gap-6">
+
+    <!-- Tilt card -->
+    <div id="comic-tilt" class="glass rounded-2xl p-4 shadow-2xl cursor-pointer select-none">
+      <div class="relative">
+        <img
+          id="comic-img"
+          src="{{ comic.image_url }}"
+          alt="{{ comic.title }}"
+          class="rounded-xl shadow-lg"
+          style="width:216px; height:324px; object-fit:cover;"
+          loading="eager"
+          draggable="false"
+        />
+        <!-- Gloss overlay — positioned on top of the image -->
+        <div id="comic-gloss"></div>
+      </div>
+    </div>
+
+    <!-- Comic info -->
+    <div class="text-center">
+      <p id="comic-series" class="text-2xl font-semibold drop-shadow" style="color: {{ comic.dominant_color }}">{{ comic.series_name }}</p>
+      <p id="comic-issue" class="text-base mt-1 font-medium tracking-wide" style="color: {{ comic.dominant_color }}; opacity: 0.8">
+        {% if comic.issue_number != "" %}Issue #{{ comic.issue_number }}{% endif %}
+      </p>
+    </div>
+
+    <!-- Fetch button -->
+    <button id="fetch-btn" class="glass px-8 py-3 rounded-full text-white font-semibold text-sm tracking-wide shadow-lg">
+      Fetch a New Comic
+    </button>
+
+  </div>
+  {% else %}
+  <div class="glass rounded-2xl p-10 text-white/80 text-center shadow-xl max-w-sm">
+    <p class="text-xl font-semibold mb-2">No comic available today</p>
+    <p class="text-sm text-white/50">Check back later or verify your setup.</p>
+  </div>
+  {% endif %}
+
+</main>
+
+<script>
+/* ── Restore persisted comic from localStorage ────────────────────────────── *
+ * Runs synchronously so the image src is swapped before the first paint.
+ * The image starts at opacity:0 (CSS) and is revealed here either way.      */
+(function () {
+  var img    = document.getElementById('comic-img');
+  var series = document.getElementById('comic-series');
+  var issue  = document.getElementById('comic-issue');
+  if (!img) return;
+
+  function revealImg() {
+    img.onload = img.onerror = null;
+    img.style.opacity = '1';
+  }
+
+  try {
+    var raw = localStorage.getItem('comicoftheday');
+    if (raw) {
+      var stored = JSON.parse(raw);
+      if (stored && stored.image_url) {
+        /* Apply stored gradient — no transition yet (body CSS hasn't settled),
+           so override directly via inline style which wins the cascade. */
+        document.body.style.setProperty('--grad-color1', stored.dominant_color);
+        document.body.style.setProperty('--grad-color2', stored.secondary_color);
+
+        if (series) {
+          series.textContent  = stored.series_name || '';
+          series.style.color  = stored.dominant_color;
+        }
+        if (issue) {
+          issue.textContent   = stored.issue_number ? 'Issue #' + stored.issue_number : '';
+          issue.style.color   = stored.dominant_color;
+        }
+
+        if (img.src !== stored.image_url) {
+          img.src = stored.image_url;
+          img.alt = stored.title || '';
+          img.onload  = revealImg;
+          img.onerror = revealImg;
+          /* already cached? complete fires synchronously */
+          if (img.complete && img.naturalWidth) revealImg();
+          return;
+        }
+      }
+    }
+  } catch (_) {}
+
+  /* No stored comic (or same as server-rendered): just reveal */
+  revealImg();
+}());
+
+
+/* ── Tilt + Gloss ─────────────────────────────────────────────────────────── */
+(function () {
+  const card  = document.getElementById('comic-tilt');
+  const gloss = document.getElementById('comic-gloss');
+  if (!card) return;
+
+  const MAX_TILT = 14;  // max rotation in degrees
+  const SCALE    = 1.04;
+
+  card.addEventListener('mousemove', function (e) {
+    card.classList.remove('is-resetting');
+
+    const r  = card.getBoundingClientRect();
+    const x  = e.clientX - r.left;
+    const y  = e.clientY - r.top;
+    const cx = r.width  / 2;
+    const cy = r.height / 2;
+
+    const rotY =  ((x - cx) / cx) * MAX_TILT;
+    const rotX = -((y - cy) / cy) * MAX_TILT;
+
+    card.style.transform =
+      'perspective(700px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(' + SCALE + ')';
+
+    /* position the gloss highlight at the cursor */
+    var gx = (x / r.width)  * 100;
+    var gy = (y / r.height) * 100;
+    gloss.style.background =
+      'radial-gradient(circle at ' + gx + '% ' + gy + '%, ' +
+      'rgba(255,255,255,0.40) 0%, rgba(255,255,255,0.06) 50%, transparent 70%)';
+    gloss.style.opacity = '1';
+  });
+
+  card.addEventListener('mouseleave', function () {
+    card.classList.add('is-resetting');
+    card.style.transform =
+      'perspective(700px) rotateX(0deg) rotateY(0deg) scale(1)';
+    gloss.style.opacity = '0';
+  });
+}());
+
+
+/* ── Fetch a New Comic ────────────────────────────────────────────────────── */
+(function () {
+  var btn    = document.getElementById('fetch-btn');
+  var img    = document.getElementById('comic-img');
+  var series = document.getElementById('comic-series');
+  var issue  = document.getElementById('comic-issue');
+  if (!btn) return;
+
+  btn.addEventListener('click', function () {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span>Fetching…';
+
+    fetch('/api/comic/random')
+      .then(function (res) {
+        if (!res.ok) throw new Error('server error');
+        return res.json();
+      })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+
+        /* 1. Kick off gradient transition — CSS handles the smooth blend */
+        document.body.style.setProperty('--grad-color1', data.dominant_color);
+        document.body.style.setProperty('--grad-color2', data.secondary_color);
+
+        /* 2. Fade the cover out */
+        img.style.opacity = '0';
+
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            /* 3. Swap content while hidden */
+            img.src             = data.image_url;
+            img.alt             = data.title || '';
+            series.textContent  = data.series_name || '';
+            series.style.color  = data.dominant_color;
+            issue.textContent   = data.issue_number ? 'Issue #' + data.issue_number : '';
+            issue.style.color   = data.dominant_color;
+
+            /* 3a. Persist so the next page load shows this comic */
+            try {
+              localStorage.setItem('comicoftheday', JSON.stringify({
+                image_url:       data.image_url,
+                title:           data.title           || '',
+                series_name:     data.series_name     || '',
+                issue_number:    data.issue_number    || '',
+                dominant_color:  data.dominant_color,
+                secondary_color: data.secondary_color,
+              }));
+            } catch (_) {}
+
+            /* 4. Fade back in once the new image is ready */
+            function reveal() { img.style.opacity = '1'; resolve(); }
+            if (img.complete && img.naturalWidth) {
+              reveal();
+            } else {
+              img.onload  = reveal;
+              img.onerror = reveal; /* don't hang on a broken image */
+            }
+          }, 300);
+        });
+      })
+      .then(function () {
+        btn.innerHTML = 'Fetch a New Comic';
+        btn.disabled  = false;
+      })
+      .catch(function () {
+        img.style.opacity = '1';
+        btn.innerHTML = 'Try again';
+        setTimeout(function () {
+          btn.innerHTML = 'Fetch a New Comic';
+          btn.disabled  = false;
+        }, 2000);
+      });
+  });
+}());
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comicoftheday"
+version = "1.0.0"
+description = "Comic of the Day - Marvel comic featuring daily rotating characters"
+requires-python = ">=3.9"
+dependencies = [
+    "flask>=3.1",
+    "requests>=2.32",
+    "Pillow>=10.4",
+    "colorthief>=0.2.1",
+    "PyYAML>=6.0",
+    "python-dotenv>=1.0",
+    "gunicorn>=22.0",
+]
+
+[project.scripts]
+comicoftheday = "comicoftheday.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

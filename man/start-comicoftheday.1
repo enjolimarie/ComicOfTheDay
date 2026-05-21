@@ -1,0 +1,58 @@
+.TH START-COMICOFTHEDAY 1 "May 2026" "Comic of the Day 1.0" "User Commands"
+.SH NAME
+start-comicoftheday \- start the Comic of the Day web application
+.SH SYNOPSIS
+.B start-comicoftheday.sh
+[\fB\-\-host\fR \fIHOST\fR]
+[\fB\-\-port\fR \fIPORT\fR]
+[\fB\-\-debug\fR]
+[\fB\-\-config\fR \fIPATH\fR]
+[\fB\-\-cache\-dir\fR \fIPATH\fR]
+.SH DESCRIPTION
+Activates the Python virtual environment, loads \fI.env\fR, and launches
+the Comic of the Day Flask application using the \fBcomicoftheday\fR
+entry point.
+If the virtual environment does not exist, \fBbootstrap.sh\fR is run first.
+.SH OPTIONS
+.TP
+.BR \-\-host " " \fIHOST\fR
+Bind address. Overrides \fBFLASK_HOST\fR environment variable and the
+\fIapp.host\fR setting in the YAML config. Default: \fI127.0.0.1\fR.
+.TP
+.BR \-\-port " " \fIPORT\fR
+TCP port to listen on. Overrides \fBFLASK_PORT\fR and \fIapp.port\fR.
+Default: \fI5000\fR.
+.TP
+.BR \-\-debug
+Enable Flask debug mode with auto-reload. Do not use in production.
+.TP
+.BR \-\-config " " \fIPATH\fR
+Path to an alternate YAML configuration file.
+Default: \fIconfig/comicoftheday.yaml\fR relative to the project root.
+.TP
+.BR \-\-cache\-dir " " \fIPATH\fR
+Directory for daily JSON cache files. Overrides \fIcache.dir\fR in config.
+.SH FILES
+.TP
+.I .env
+Required. Contains \fBMARVEL_PUBLIC_KEY\fR and \fBMARVEL_PRIVATE_KEY\fR.
+Copy from \fI.env.example\fR and populate before first run.
+.TP
+.I config/comicoftheday.yaml
+Main configuration file. Character IDs, API settings, and server options.
+.TP
+.I cache/YYYY-MM-DD.json
+Daily cached comic data. One file per calendar day; files older than 7 days
+are purged automatically on startup.
+.SH ENVIRONMENT
+.TP
+.B MARVEL_PUBLIC_KEY
+Marvel API public key (loaded from .env).
+.TP
+.B MARVEL_PRIVATE_KEY
+Marvel API private key (loaded from .env). Never exposed to the browser.
+.TP
+.B FLASK_HOST, FLASK_PORT, FLASK_DEBUG, FLASK_SECRET_KEY
+Override the corresponding \fIapp.*\fR settings in the YAML config.
+.SH SEE ALSO
+.BR stop-comicoftheday (1)

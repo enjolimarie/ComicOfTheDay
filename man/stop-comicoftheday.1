@@ -1,0 +1,19 @@
+.TH STOP-COMICOFTHEDAY 1 "May 2026" "Comic of the Day 1.0" "User Commands"
+.SH NAME
+stop-comicoftheday \- stop the Comic of the Day web application
+.SH SYNOPSIS
+.B stop-comicoftheday.sh
+.SH DESCRIPTION
+Finds the running \fBcomicoftheday\fR process by name and sends it \fBSIGTERM\fR.
+Also removes any leftover \fI.tmp\fR files from the cache directory.
+If no matching process is found, exits cleanly with a message.
+.SH EXIT STATUS
+.TP
+.B 0
+Process stopped successfully, or no process was running.
+.SH FILES
+.TP
+.I cache/*.tmp
+Partial cache write files. Removed on stop.
+.SH SEE ALSO
+.BR start-comicoftheday (1)

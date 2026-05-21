@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}API — Comic of the Day{% endblock %}
+
+{% block body_attrs %}
+  style="min-height:100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);"
+{% endblock %}
+
+{% block content %}
+<main class="pt-24 pb-16 px-6 max-w-3xl mx-auto text-white/90">
+
+  <h1 class="text-4xl font-bold mb-8 text-white">API Reference</h1>
+
+  <!-- GET / -->
+  <section class="glass rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-green-500/20 text-green-300 font-mono text-sm px-2 py-0.5 rounded">GET</span>
+      <code class="text-white font-mono">/</code>
+    </div>
+    <p class="text-white/70">Returns the Comic of the Day as an HTML page with dynamic gradient background.</p>
+  </section>
+
+  <!-- GET /api/comic -->
+  <section class="glass rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-green-500/20 text-green-300 font-mono text-sm px-2 py-0.5 rounded">GET</span>
+      <code class="text-white font-mono">/api/comic</code>
+    </div>
+    <p class="text-white/70 mb-4">Returns today's comic data as JSON. Served from the daily cache after the first request.</p>
+
+    <h3 class="text-sm font-semibold text-white/50 uppercase tracking-wider mb-2">Response Fields</h3>
+    <table class="w-full text-sm text-white/70 mb-4">
+      <thead>
+        <tr class="text-white/50 text-left border-b border-white/10">
+          <th class="pb-2 pr-4">Field</th>
+          <th class="pb-2 pr-4">Type</th>
+          <th class="pb-2">Description</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        <tr><td class="py-1.5 pr-4 font-mono">date</td><td class="pr-4">string</td><td>ISO date (YYYY-MM-DD)</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">character_id</td><td class="pr-4">integer</td><td>Marvel character ID used</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">comic_id</td><td class="pr-4">integer</td><td>Marvel comic ID</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">title</td><td class="pr-4">string</td><td>Full comic title</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">series_name</td><td class="pr-4">string</td><td>Series name</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">issue_number</td><td class="pr-4">number</td><td>Issue number within series</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">image_url</td><td class="pr-4">string</td><td>Cover image URL (Marvel CDN)</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">dominant_color</td><td class="pr-4">string</td><td>Hex color extracted from cover (#rrggbb)</td></tr>
+        <tr><td class="py-1.5 pr-4 font-mono">secondary_color</td><td class="pr-4">string</td><td>Second distinct hex color from cover</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="text-sm font-semibold text-white/50 uppercase tracking-wider mb-2">Example Response</h3>
+    <pre class="bg-gray-900/80 rounded-xl p-4 font-mono text-green-300 text-sm overflow-x-auto">{
+  "date": "2026-05-21",
+  "character_id": 1009718,
+  "comic_id": 67890,
+  "title": "Wolverine (1982) #1",
+  "series_name": "Wolverine (1982)",
+  "issue_number": 1,
+  "image_url": "https://i.annihil.us/u/prod/marvel/.../portrait_incredible.jpg",
+  "dominant_color": "#c0392b",
+  "secondary_color": "#2c3e50"
+}</pre>
+  </section>
+
+  <!-- GET /about -->
+  <section class="glass rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-green-500/20 text-green-300 font-mono text-sm px-2 py-0.5 rounded">GET</span>
+      <code class="text-white font-mono">/about</code>
+    </div>
+    <p class="text-white/70">Project information, dependencies, and Marvel API attribution.</p>
+  </section>
+
+  <!-- GET /api -->
+  <section class="glass rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-green-500/20 text-green-300 font-mono text-sm px-2 py-0.5 rounded">GET</span>
+      <code class="text-white font-mono">/api</code>
+    </div>
+    <p class="text-white/70">This page.</p>
+  </section>
+
+  <!-- GET /sitemap -->
+  <section class="glass rounded-2xl p-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="bg-green-500/20 text-green-300 font-mono text-sm px-2 py-0.5 rounded">GET</span>
+      <code class="text-white font-mono">/sitemap</code>
+    </div>
+    <p class="text-white/70">Visual sitemap of all routes.</p>
+  </section>
+
+</main>
+{% endblock %}

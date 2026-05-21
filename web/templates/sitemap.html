@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Sitemap — Comic of the Day{% endblock %}
+
+{% block body_attrs %}
+  style="min-height:100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);"
+{% endblock %}
+
+{% block content %}
+<main class="pt-24 pb-16 px-6 max-w-3xl mx-auto text-white/90">
+
+  <h1 class="text-4xl font-bold mb-8 text-white">Sitemap</h1>
+
+  <div class="glass rounded-2xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-white/15 text-white/50 text-left uppercase tracking-wider text-xs">
+          <th class="px-6 py-3">Method</th>
+          <th class="px-6 py-3">Route</th>
+          <th class="px-6 py-3">Description</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10 text-white/75">
+        <tr class="hover:bg-white/5 transition">
+          <td class="px-6 py-4"><span class="font-mono bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">GET</span></td>
+          <td class="px-6 py-4"><a href="/" class="font-mono text-white hover:underline">/</a></td>
+          <td class="px-6 py-4">Home — Comic of the Day</td>
+        </tr>
+        <tr class="hover:bg-white/5 transition">
+          <td class="px-6 py-4"><span class="font-mono bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">GET</span></td>
+          <td class="px-6 py-4"><a href="/api/comic" class="font-mono text-white hover:underline">/api/comic</a></td>
+          <td class="px-6 py-4">JSON — today's comic data with colors</td>
+        </tr>
+        <tr class="hover:bg-white/5 transition">
+          <td class="px-6 py-4"><span class="font-mono bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">GET</span></td>
+          <td class="px-6 py-4"><a href="/about" class="font-mono text-white hover:underline">/about</a></td>
+          <td class="px-6 py-4">About — project info &amp; dependencies</td>
+        </tr>
+        <tr class="hover:bg-white/5 transition">
+          <td class="px-6 py-4"><span class="font-mono bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">GET</span></td>
+          <td class="px-6 py-4"><a href="/api" class="font-mono text-white hover:underline">/api</a></td>
+          <td class="px-6 py-4">API — route documentation</td>
+        </tr>
+        <tr class="hover:bg-white/5 transition">
+          <td class="px-6 py-4"><span class="font-mono bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">GET</span></td>
+          <td class="px-6 py-4"><a href="/sitemap" class="font-mono text-white hover:underline">/sitemap</a></td>
+          <td class="px-6 py-4">Sitemap — this page</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+{% endblock %}

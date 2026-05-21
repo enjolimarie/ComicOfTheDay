@@ -1,0 +1,44 @@
+app:
+  host: "127.0.0.1"
+  port: 5000
+  debug: false
+  secret_key: "changeme"
+
+cache:
+  dir: "cache"      # relative to project root; resolved to absolute path at runtime
+
+comics:
+  # Search terms used to sample diverse comics from the unofficial API.
+  # Each day a term is picked by date-seeded random, then one comic from
+  # the 50 results is chosen — also seeded by date.
+  search_terms:
+    - "amazing"
+    - "uncanny"
+    - "mighty"
+    - "tales"
+    - "adventures"
+    - "annual"
+    - "special"
+    - "giant"
+    - "iron"
+    - "spider"
+    - "captain"
+    - "hulk"
+    - "thor"
+    - "ghost"
+    - "strange"
+    - "moon"
+    - "dark"
+    - "war"
+    - "age"
+    - "ultimate"
+    - "classic"
+    - "x-men"
+    - "avengers"
+    - "fantastic"
+    - "wolverine"
+    - "venom"
+    - "carnage"
+    - "nova"
+    - "silver"
+    - "black"

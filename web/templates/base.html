@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Comic of the Day{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <style>
+    .glass {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .nav-link {
+      color: rgba(255,255,255,0.75);
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-brand {
+      font-family: 'Bangers', 'Impact', cursive;
+      font-size: 1.45rem;
+      letter-spacing: 0.08em;
+      color: #FFE629;
+      -webkit-text-stroke: 1.5px #111;
+      text-shadow: 2px 2px 0 #111, 3px 3px 0 rgba(0,0,0,0.2);
+      line-height: 1;
+    }
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body {% block body_attrs %}{% endblock %}>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass px-6 py-3 flex items-center justify-between">
+    <a href="/" class="nav-brand">Comic of the Day</a>
+    <div class="flex gap-6 text-sm font-medium">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/api" class="nav-link">API</a>
+      <a href="/sitemap" class="nav-link">Sitemap</a>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <footer class="fixed bottom-0 left-0 right-0 text-center text-white/40 text-xs py-2">
+    Data provided by Marvel. &copy; {{ 2026 }} Marvel
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}About — Comic of the Day{% endblock %}
+
+{% block body_attrs %}
+  style="min-height:100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);"
+{% endblock %}
+
+{% block content %}
+<main class="pt-24 pb-16 px-6 max-w-3xl mx-auto text-white/90">
+
+  <h1 class="text-4xl font-bold mb-8 text-white">About</h1>
+
+  <section class="glass rounded-2xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3 text-white">What is this?</h2>
+    <p class="leading-relaxed text-white/75">
+      <strong class="text-white">Comic of the Day</strong> picks a random Marvel comic issue every day
+      from a curated pool of characters — Wolverine, Ghost Rider, Doctor Strange, Venom, Moon Knight,
+      Rogue, Gambit, and members of the X-Men and Fantastic Four. The comic stays the same all day, then
+      changes at midnight.
+    </p>
+  </section>
+
+  <section class="glass rounded-2xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3 text-white">How it works</h2>
+    <ul class="list-disc list-inside space-y-2 text-white/75">
+      <li>A character is selected each day using a date-seeded random algorithm.</li>
+      <li>The Marvel API is queried for that character's comics (server-side only — private key never reaches the browser).</li>
+      <li>A valid comic cover is chosen, also seeded by the current date.</li>
+      <li>The cover image is downloaded server-side and two dominant colors are extracted using <strong class="text-white">colorthief</strong>.</li>
+      <li>Those colors become the page's gradient background — no canvas CORS issues.</li>
+      <li>Results are cached in a daily JSON file so the Marvel API is called at most once per day.</li>
+    </ul>
+  </section>
+
+  <section class="glass rounded-2xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3 text-white">Dependencies</h2>
+    <table class="w-full text-sm text-white/75">
+      <thead>
+        <tr class="text-white text-left border-b border-white/20">
+          <th class="pb-2 pr-4">Package</th>
+          <th class="pb-2">Purpose</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        <tr><td class="py-2 pr-4 font-mono">flask</td><td>Web framework &amp; Jinja2 templates</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">requests</td><td>Marvel API calls &amp; image download</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">Pillow</td><td>Image decoding (required by colorthief)</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">colorthief</td><td>Dominant color extraction</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">PyYAML</td><td>Config file parsing</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">python-dotenv</td><td>.env file loading</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">gunicorn</td><td>Production WSGI server</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">HTMX 2.0</td><td>Partial page updates (CDN)</td></tr>
+        <tr><td class="py-2 pr-4 font-mono">Tailwind CSS</td><td>Styling (CDN)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="glass rounded-2xl p-6">
+    <h2 class="text-xl font-semibold mb-3 text-white">Marvel Attribution</h2>
+    <p class="text-white/75">
+      Data provided by Marvel. &copy; 2026 MARVEL.
+      Visit <a href="https://developer.marvel.com" class="underline text-white/90 hover:text-white" target="_blank" rel="noopener">developer.marvel.com</a>
+      for more information about the Marvel API.
+    </p>
+  </section>
+
+</main>
+{% endblock %}
